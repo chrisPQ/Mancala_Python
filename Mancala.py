@@ -1,7 +1,28 @@
 # Author: Christopher Qualls
 # GitHub username: chrisPQ
 # Date: 11/21/2022
-# Description: Take in a list and output the maximum of the list
+# Description: Mancala Game implementation
+
+# "DETAILED TEXT DESCRIPTIONS OF HOW TO HANDLE THE SCENARIOS"
+# 1. The mancala class will be initiated and there will be an empty list created to hold the player objects. The create
+# player method will then be called and the player, passed into the method, will be amended to this empty list.
+# 2. The create player method will take in a player object as a parameter, and this object will be amended to the
+# mancala class' player list, if the player list is already 2 long, the player won't be amended to the list to prevent
+# too many players being added.
+# 3. The print board method, first prints the first player's score, then goes through the first player's pit list,
+# printing each value as it moves. The next player's pit list is then gone through, but in the opposite direction to
+# reverse its order to appear the correct way around. The score of that player is then printed and the print_board
+# method is complete.
+# 4. If the sum of all a player's pit values is 0, then the game is in an end state. The game adds all the
+# other player's pit values to their score value. The score values are then compared and the higher value wins. This is
+# done by iterating through the player's pit list and adding the values of each index.
+# 5. The value of the chosen pit is acquired by iterating through the pit list, this value is then used to iterate
+# forward in the pit list that many indexes. Each index it passes over is added by 1. If it goes over a player's
+# score pit, it checks if the player moving the piece owns that pit. If the index of the final move is the same as the
+# player's score pit, the player is allowed to take another turn. If the player's pit is empty, then it checks the
+# distance to the player's score pit, and moves that distance past the score pit. The pit it lands on is then set to 0
+# and the value is added to the player's score pit.
+
 class Mancala:
     """
     has a list of the two player objects, maxed out at two
