@@ -34,22 +34,18 @@ class Mancala:
         """
         will create a private empty list to hold the player objects
         """
-        pass
-
-    def create_player(self, name):
-        """
-        will create a
-        :param name:
-        :return:
-        """
-        return Player(name)
+        self.__player_list = []
 
     def add_player_to_game(self, player_object):
         """
         appends the given player object to the mancala game list of players
         :return:
         """
-        pass
+        self.__player_list.append(player_object)
+
+    def view_players(self):
+        for x in self.__player_list:
+            print(x)
 
     def play_game(self, player_number, pit_number):
         """
@@ -64,7 +60,12 @@ class Mancala:
         :param pit_number: the pit number of the player, between 1-6
         :return: will not return anything, will instead run the print board function
         """
-        pass
+        player = self.__player_list[player_number]
+        pit_range = player.get_value_of_pit(pit_number)
+        for x in range(pit_number, pit_range):
+            new_value = player.get_value_of_pit(x+1) + 1
+            player.update_pit_value(x+1, new_value)
+        player.update_pit_value(pit_number, 0)
 
     def return_winner(self):
         """
@@ -72,7 +73,14 @@ class Mancala:
         each player's score and returns who wins
         :return: returns the player object with the highest score if the game is in an end state
         """
-        pass
+        pit_value = 0
+        for x in self.__player_list:
+            for y in range(0, 6):
+                pit_value = pit_value + x.get_value_of_pit(y)
+            if pit_value == 0:
+                return True
+            pit_value = 0
+        return False
 
     def print_board(self):
         """
@@ -80,20 +88,36 @@ class Mancala:
         will iterate through the board of both players, starting with their store value and then each pit with their value
         :return:
         """
-        return
+        board_string = " "
+        board_string = board_string + str(self.__player_list[1].get_value_of_pit(-1))
+        for y in range(0, 7):
+            pit_value = self.__player_list[0].get_value_of_pit(y)
+            board_string = board_string + " " + str(pit_value)
+        print(board_string)
+        board_string = ""
+        for y in range(1, 8):
+            pit_value = self.__player_list[1].get_value_of_pit(-y)
+            board_string = board_string + " " + str(pit_value)
+        board_string = board_string + " " + str(self.__player_list[0].get_value_of_pit(6))
+        print(board_string)
 
 
 class Player:
     """
 
     """
-    def __init__(self, name, seeds):
+    def __init__(self, name, seeds=0):
         """
 
         :param name:
         :param seeds:
         """
-        pass
+        self.__name = name
+        self.__seeds = seeds
+        self.__pits = []
+        for x in range(0, 6):
+            self.__pits.append(4)
+        self.__pits.append(self.__seeds)
 
     def get_value_of_pit(self, pit_index):
         """
@@ -101,9 +125,9 @@ class Player:
         :param pit_index:
         :return:
         """
-        pass
+        return self.__pits[pit_index]
 
-    def update_pit_value(self, value):
+    def update_pit_value(self, pit_index, value):
         """
         updating the pit value is used when you move the pieces. You can set the pit to 0 when you start there, and add
         to the pit when you drop seeds off as you go, or when you activate the second special move and set the opponents
@@ -111,7 +135,7 @@ class Player:
         :param value:
         :return:
         """
-        pass
+        self.__pits[pit_index] = value
 
     def add_to_score(self, value):
         """
@@ -119,11 +143,27 @@ class Player:
         :param value:
         :return:
         """
-        pass
+        self.__pits[6] = self.__pits[6] + value
 
     def get_score(self):
         """
         returns the score of the player, used to determine the winner of the game
         :return:
         """
-    pass
+        return self.__pits[6]
+
+
+game = Mancala()
+player1 = Player("Monkey")
+player2 = Player("Gibbon")
+game.add_player_to_game(player1)
+game.view_players()
+game.add_player_to_game(player2)
+game.view_players()
+player1.update_pit_value(6, 11)
+for x in range(0, 4):
+    player1.update_pit_value(x, 0)
+
+print(game.return_winner())
+game.play_game(0, 4)
+game.print_board()
