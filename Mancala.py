@@ -70,7 +70,7 @@ class Mancala:
             return "Game is ended"
 
         # index out of range handling
-        if pit_number > 6:
+        if pit_number > 6 or pit_number <= 0:
             return "Invalid number for pit index"
 
         if player_number > 2:
