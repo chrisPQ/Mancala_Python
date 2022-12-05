@@ -36,13 +36,13 @@ class Mancala:
         """
         self.__player_list = []
 
-    def add_player_to_game(self, player_object):
+    def create_player(self, player_name):
         """
         appends the given player object to the mancala game list of players
         :return:
         """
         if len(self.__player_list) < 2:
-            self.__player_list.append(player_object)
+            self.__player_list.append(Player(player_name))
         else:
             return "can't add more players"
 
@@ -266,14 +266,11 @@ class Player:
 
 def main():
     game = Mancala()
-    player1 = Player("Monkey")
-    player2 = Player("Gibbon")
-    player3 = Player("siamang")
-    game.add_player_to_game(player1)
+    game.create_player("Monkey")
     game.view_players()
-    game.add_player_to_game(player2)
+    game.create_player("Gibbon")
     game.view_players()
-    print(game.add_player_to_game(player3))
+    print(game.create_player("Siamang"))
 
     print(game.play_game(1, 3))
     game.play_game(1, 1)
