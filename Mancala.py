@@ -50,7 +50,7 @@ class Mancala:
         for x in self.__player_list:
             print(x)
 
-    def play_game(self, player_number, pit_number):
+    def play_game(self, player_number, pit_number: int):
         """
         defines which player is moving, and what pit they are using, they will take the value of their pit, and move
         forward through their board, based on the chosen pit's value, dropping off pieces as they go. They may need to
@@ -64,6 +64,13 @@ class Mancala:
         :return: will not return anything, will instead run the print board function
         """
         # I comment this section heavily because it is confusing otherwise with a bunch of magic numbers
+
+        # index out of range handling
+        if pit_number > 6:
+            return "Invalid pit value"
+
+        if player_number > 2:
+            return "Invalid player"
 
         # convert pit number to proper index values i.e. 1 is actually 0 in lists
         pit_number = pit_number - 1
@@ -275,7 +282,7 @@ def main():
     game.create_player("Gibbon")
     game.view_players()
     print(game.create_player("Siamang"))
-
+    game.play_game(1, 15)
     game.play_game(1, 1)
     game.play_game(1, 2)
     game.play_game(1, 3)
