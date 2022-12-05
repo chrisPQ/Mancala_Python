@@ -72,6 +72,7 @@ class Mancala:
         if player_number == 1:
             moves_remaining = board_list[pit_number]
             board_list[pit_number] = 0
+
             while moves_remaining > 0:
                 if pit_number + 1 == 6:
                     self.__player_list[0].add_to_score(1)
@@ -83,8 +84,17 @@ class Mancala:
                     pit_number = pit_number + 1
                     board_list[pit_number] = board_list[pit_number] + 1
                 moves_remaining = moves_remaining - 1
+
             if pit_number == 6:  # landing in score pit check
                 print("player 1 take another turn")
+
+            distance_to_score = 6 - pit_number
+            opposite_pit = distance_to_score * 2 + pit_number
+            if board_list[pit_number] == 1:
+                opposite_pit_value = board_list[opposite_pit]
+                board_list[opposite_pit] = 0
+                board_list[pit_number] = 0
+                self.__player_list[0].add_to_score(opposite_pit_value + 1)
         elif player_number == 2:
             pit_number = pit_number + 7
             moves_remaining = board_list[pit_number]
@@ -102,7 +112,15 @@ class Mancala:
                 moves_remaining = moves_remaining - 1
             if pit_number == 12:  # landing in score pit check
                 print("player 2 take another turn")
-        print(board_list)
+
+            distance_to_score = 13 - pit_number
+            opposite_pit = (distance_to_score * 2 + pit_number) % 13 - 1  # minus 1 as indexes start at 0
+            if board_list[pit_number] == 1:
+                opposite_pit_value = board_list[opposite_pit]
+                board_list[opposite_pit] = 0
+                board_list[pit_number] = 0
+                self.__player_list[0].add_to_score(opposite_pit_value + 1)
+
 
         # spitting out new pit values
         for index in range(0, 6):
@@ -112,7 +130,7 @@ class Mancala:
         # pit_movement = player.get_value_of_pit(pit_number)
 
         # player.update_pit_value(pit_number, 0)
-        self.print_board()
+        return board_list
 
     def return_winner(self):
         """
@@ -125,6 +143,7 @@ class Mancala:
             for y in range(0, 6):
                 pit_value = pit_value + player.get_value_of_pit(y)
             if pit_value == 0:
+
                 return True
             pit_value = 0
         return False
@@ -139,18 +158,12 @@ class Mancala:
         {player 2 score, player 1 pits: {pit1, pit2, pit3, pit4, pit5, pit6}, player 1 score}
         :return:
         """
-        board_string = ""
-        for pit_value in self.__player_list[1].get_pit_list():
-            board_string = str(pit_value) + " " + board_string
-        board_string = str(self.__player_list[1].get_score()) + " " + board_string
-        board_string = board_string + str(self.__player_list[0].get_score())
-        print(board_string)
-        board_string = ""
-        for pit_value in self.__player_list[0].get_pit_list():
-            board_string = board_string + " " + str(pit_value)
-        board_string = str(self.__player_list[1].get_score()) + board_string
-        board_string = board_string + " " + str(self.__player_list[0].get_score())
-        print(board_string)
+        print("player1:")
+        print("store: " + str(self.__player_list[0].get_score()))
+        print(self.__player_list[0].get_pit_list())
+        print("player2:")
+        print("store: " + str(self.__player_list[1].get_score()))
+        print(self.__player_list[1].get_pit_list())
 
 
 
@@ -216,7 +229,7 @@ game.add_player_to_game(player1)
 game.view_players()
 game.add_player_to_game(player2)
 game.view_players()
-player1.add_to_score(110)
+# player1.add_to_score(110)
 # for x in range(0, 6):
 #     player1.update_pit_value(x, 4)
 #     player2.update_pit_value(x, 4)
@@ -226,13 +239,14 @@ print("Player 1 pits: ")
 player1.print_player_pits()
 print("Player 2 pits: ")
 player2.print_player_pits()
-game.play_game(1, 3)
 game.play_game(1, 1)
-game.play_game(2, 3)
-game.play_game(2, 4)
 game.play_game(1, 2)
-game.play_game(2, 2)
-game.play_game(1, 1)
-
+game.play_game(1, 3)
+game.play_game(1, 4)
+game.play_game(1, 5)
+game.play_game(1, 6)
+game.print_board()
+print(game.return_winner())
+print(game.return_winner())
 
 
