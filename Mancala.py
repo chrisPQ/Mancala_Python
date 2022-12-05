@@ -35,6 +35,7 @@ class Mancala:
         will create a private empty list to hold the player objects
         """
         self.__player_list = []
+        self.__game_end_flag = False
 
     def create_player(self, player_name):
         """
@@ -65,12 +66,15 @@ class Mancala:
         """
         # I comment this section heavily because it is confusing otherwise with a bunch of magic numbers
 
+        if self.__game_end_flag:
+            return "Game is ended"
+
         # index out of range handling
         if pit_number > 6:
-            raise Exception("Invalid pit input")
+            return "Invalid number for pit index"
 
         if player_number > 2:
-            raise Exception("Invalid player input")
+            return "Invalid player input"
 
         # convert pit number to proper index values i.e. 1 is actually 0 in lists
         pit_number = pit_number - 1
@@ -157,18 +161,19 @@ class Mancala:
     def return_winner(self):
         """
         this method first iterates through each player's pit list, if they are all 0 then the game is over, it checks
-        each player's score and returns who wins
+        each player's score and returns who won
         :return: returns the player object with the highest score if the game is in an end state
         """
         pit_value = 0
-        game_end_flag = False  # flag used to determine if game is in end state
+
+        # flag used to determine if game is in end state
         for player in self.__player_list:
             for y in range(0, 6):
                 pit_value = pit_value + player.get_value_of_pit(y)
             if pit_value == 0:
-                game_end_flag = True
+                self.__game_end_flag = True
             pit_value = 0
-        if game_end_flag:  # the game is in an end state, add all the pit's values to the corresponding player's score
+        if self.__game_end_flag:  # if in an end state, add all the pit's values to the corresponding player's score
             for player in self.__player_list:
                 for y in range(0, 6):
                     pit_value = pit_value + player.get_value_of_pit(y)
@@ -176,7 +181,7 @@ class Mancala:
                 player.add_to_score(pit_value)
                 pit_value = 0
         # check if game is over and who won
-        if game_end_flag:
+        if self.__game_end_flag:
             if self.__player_list[0].get_score() > self.__player_list[1].get_score():
                 return "Winner is player 1: " + str(self.__player_list[0].get_name())
             elif self.__player_list[0].get_score() < self.__player_list[1].get_score():
