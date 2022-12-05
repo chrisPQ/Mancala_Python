@@ -145,7 +145,7 @@ class Mancala:
         for player_object in self.__player_list:
             board_list = board_list + player_object.get_pit_list()
             board_list.append(player_object.get_score())
-        return board_list
+        return str(board_list)
 
     def return_winner(self):
         """
