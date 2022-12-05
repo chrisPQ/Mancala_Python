@@ -141,8 +141,10 @@ class Mancala:
         self.return_winner()
 
         # reinserting score values into board list to return board
-        board_list[6] = self.__player_list[0].get_score()
-        board_list[13] = self.__player_list[1].get_score()
+        board_list = []
+        for player_object in self.__player_list:
+            board_list = board_list + player_object.get_pit_list()-
+            board_list.append(player_object.get_score())
         return board_list
 
     def return_winner(self):
@@ -170,8 +172,10 @@ class Mancala:
         if game_end_flag:
             if self.__player_list[0].get_score() > self.__player_list[1].get_score():
                 return "Winner is player 1: " + str(self.__player_list[0].get_name())
-            else:
+            elif self.__player_list[0].get_score() < self.__player_list[1].get_score():
                 return "Winner is player 2: " + str(self.__player_list[1].get_name())
+            else:
+                return "It's a tie"
         else:
             return "Game has not ended"
 
@@ -272,13 +276,12 @@ def main():
     game.view_players()
     print(game.create_player("Siamang"))
 
-    print(game.play_game(1, 3))
     game.play_game(1, 1)
-    game.play_game(2, 3)
-    game.play_game(2, 4)
     game.play_game(1, 2)
-    game.play_game(2, 2)
-    game.play_game(1, 1)
+    game.play_game(1, 3)
+    game.play_game(1, 4)
+    game.play_game(1, 5)
+    game.play_game(1, 6)
     game.print_board()
     print(game.return_winner())
 
