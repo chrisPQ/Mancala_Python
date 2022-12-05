@@ -67,10 +67,10 @@ class Mancala:
 
         # index out of range handling
         if pit_number > 6:
-            return "Invalid pit value"
+            return
 
         if player_number > 2:
-            return "Invalid player"
+            return
 
         # convert pit number to proper index values i.e. 1 is actually 0 in lists
         pit_number = pit_number - 1
