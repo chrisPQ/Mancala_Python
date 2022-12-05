@@ -41,7 +41,10 @@ class Mancala:
         appends the given player object to the mancala game list of players
         :return:
         """
-        self.__player_list.append(player_object)
+        if len(self.__player_list) < 2:
+            self.__player_list.append(player_object)
+        else:
+            return "can't add more players"
 
     def view_players(self):
         for x in self.__player_list:
@@ -60,27 +63,30 @@ class Mancala:
         :param pit_number: the pit number of the player, between 1-6
         :return: will not return anything, will instead run the print board function
         """
+        # I comment this section heavily because it is confusing otherwise with a bunch of magic numbers
+
+        # convert pit number to proper index values i.e. 1 is actually 0 in lists
         pit_number = pit_number - 1
         board_list = []
         # loading pit values
         for player_object in self.__player_list:
             board_list = board_list + player_object.get_pit_list()
             board_list.append(player_object.get_score())
-        print(board_list)
 
-        # game functions
+        # first check which player is going, as each has to take into account their score pits in board_list
         if player_number == 1:
             moves_remaining = board_list[pit_number]
             board_list[pit_number] = 0
 
+            # while we have pieces in our hand
             while moves_remaining > 0:
-                if pit_number + 1 == 6:
+                if pit_number + 1 == 6:  # check if score pit
                     self.__player_list[0].add_to_score(1)
                     pit_number = pit_number + 1
-                elif pit_number + 1 > len(board_list) - 1:
-                    pit_number = 0
+                elif pit_number + 1 >= len(board_list) - 1:  # check if the index goes into player 2's score
+                    pit_number = 0  # if it does, reset the pit you are on to your own first pit
                     board_list[pit_number] = board_list[pit_number] + 1
-                else:
+                else:  # add 1 to current pit and move forward
                     pit_number = pit_number + 1
                     board_list[pit_number] = board_list[pit_number] + 1
                 moves_remaining = moves_remaining - 1
@@ -88,23 +94,26 @@ class Mancala:
             if pit_number == 6:  # landing in score pit check
                 print("player 1 take another turn")
 
-            distance_to_score = 6 - pit_number
-            opposite_pit = distance_to_score * 2 + pit_number
-            if board_list[pit_number] == 1:
-                opposite_pit_value = board_list[opposite_pit]
-                board_list[opposite_pit] = 0
+            distance_to_score = 6 - pit_number  # check how far you are to your own score pit
+            opposite_pit = distance_to_score * 2 + pit_number  # the opposite pit will be that distance doubled
+            if board_list[pit_number] == 1:  # if the pit you are on at the end is 1, meaning it was empty
+                opposite_pit_value = board_list[opposite_pit]  # get the opposite pit's value
+                board_list[opposite_pit] = 0  # set both to 0
                 board_list[pit_number] = 0
-                self.__player_list[0].add_to_score(opposite_pit_value + 1)
+                self.__player_list[0].add_to_score(opposite_pit_value + 1)  # add both to your score (1 is your own pit)
         elif player_number == 2:
-            pit_number = pit_number + 7
+            pit_number = pit_number + 7  # offset the pit your on to player two's first pit
             moves_remaining = board_list[pit_number]
             board_list[pit_number] = 0
             while moves_remaining > 0:
-                if pit_number + 1 == 13:
+                if pit_number + 1 == 13:  # check if score pit
                     self.__player_list[1].add_to_score(1)
                     pit_number = pit_number + 1
-                elif pit_number + 1 > len(board_list) - 1:
+                elif pit_number + 1 > len(board_list) - 1:  # if you'd go outside the board list, go back to p1's pit 1
                     pit_number = 0
+                    board_list[pit_number] = board_list[pit_number] + 1
+                elif pit_number + 1 == 6:  # if you'd land in player 1's score pit, skip over it
+                    pit_number = 7
                     board_list[pit_number] = board_list[pit_number] + 1
                 else:
                     pit_number = pit_number + 1
@@ -114,22 +123,26 @@ class Mancala:
                 print("player 2 take another turn")
 
             distance_to_score = 13 - pit_number
+            # modulus needed as the opposite pit will always be the remainder of the board_list's length if you land in
+            # a player 2 pit
             opposite_pit = (distance_to_score * 2 + pit_number) % 13 - 1  # minus 1 as indexes start at 0
-            if board_list[pit_number] == 1:
+            if board_list[pit_number] == 1:  # if the pit you are on at the end is 1, meaning it was empty
                 opposite_pit_value = board_list[opposite_pit]
                 board_list[opposite_pit] = 0
                 board_list[pit_number] = 0
-                self.__player_list[0].add_to_score(opposite_pit_value + 1)
+                self.__player_list[1].add_to_score(opposite_pit_value + 1)
 
-
-        # spitting out new pit values
+        # spitting out new pit values to player object's pit lists
         for index in range(0, 6):
             self.__player_list[0].update_pit_value(index, board_list[index])
             self.__player_list[1].update_pit_value(index, board_list[index+7])
-        # player = self.__player_list[player_number]
-        # pit_movement = player.get_value_of_pit(pit_number)
 
-        # player.update_pit_value(pit_number, 0)
+        # run return winner to update board if in game state
+        self.return_winner()
+
+        # reinserting score values into board list to return board
+        board_list[6] = self.__player_list[0].get_score()
+        board_list[13] = self.__player_list[1].get_score()
         return board_list
 
     def return_winner(self):
@@ -139,19 +152,33 @@ class Mancala:
         :return: returns the player object with the highest score if the game is in an end state
         """
         pit_value = 0
+        game_end_flag = False  # flag used to determine if game is in end state
         for player in self.__player_list:
             for y in range(0, 6):
                 pit_value = pit_value + player.get_value_of_pit(y)
             if pit_value == 0:
-
-                return True
+                game_end_flag = True
             pit_value = 0
-        return False
+        if game_end_flag:  # the game is in an end state, add all the pit's values to the corresponding player's score
+            for player in self.__player_list:
+                for y in range(0, 6):
+                    pit_value = pit_value + player.get_value_of_pit(y)
+                    player.update_pit_value(y, 0)
+                player.add_to_score(pit_value)
+                pit_value = 0
+        # check if game is over and who won
+        if game_end_flag:
+            if self.__player_list[0].get_score() > self.__player_list[1].get_score():
+                return "Winner is player 1: " + str(self.__player_list[0].get_name())
+            else:
+                return "Winner is player 2: " + str(self.__player_list[1].get_name())
+        else:
+            return "Game has not ended"
 
     def print_board(self):
         """
         will print the board as integer values in a horizontal
-        will iterate through the board of both players, starting with their store value and then each pit with their value
+        will iterate through the board of both players, starting with their store and then each pit with their value
 
         assuming player 1 is facing upward:
         {player 2 score, player 2 pits: {pit6, pit5, pit4, pit3, pit2, pit1}, player 1 score}
@@ -164,12 +191,12 @@ class Mancala:
         print("player2:")
         print("store: " + str(self.__player_list[1].get_score()))
         print(self.__player_list[1].get_pit_list())
-
+        # print("_"*20)
 
 
 class Player:
     """
-
+        game object that holds a name, a score, and a list with values corresponding to stones in the pits
     """
     def __init__(self, name, seeds=0):
         """
@@ -183,6 +210,12 @@ class Player:
         for x in range(0, 6):
             self.__pits.append(4)
 
+    def get_name(self):
+        """"
+        return player's name
+        """
+        return self.__name
+
     def get_value_of_pit(self, pit_index):
         """
         will return the value of the player's pit at the given index, this is used to make moves within the game class
@@ -192,6 +225,10 @@ class Player:
         return self.__pits[pit_index]
 
     def get_pit_list(self):
+        """
+
+        :return: return player object's pit list
+        """
         return self.__pits
 
     def update_pit_value(self, pit_index, value):
@@ -199,6 +236,7 @@ class Player:
         updating the pit value is used when you move the pieces. You can set the pit to 0 when you start there, and add
         to the pit when you drop seeds off as you go, or when you activate the second special move and set the opponents
         pit value to 0
+        :param pit_index:
         :param value:
         :return:
         """
@@ -220,33 +258,33 @@ class Player:
         return self.__store
 
     def print_player_pits(self):
+        """
+        :return: just print the player's pit list, used for debugging
+        """
         print(self.__pits)
 
-game = Mancala()
-player1 = Player("Monkey")
-player2 = Player("Gibbon")
-game.add_player_to_game(player1)
-game.view_players()
-game.add_player_to_game(player2)
-game.view_players()
-# player1.add_to_score(110)
-# for x in range(0, 6):
-#     player1.update_pit_value(x, 4)
-#     player2.update_pit_value(x, 4)
 
-print(game.return_winner())
-print("Player 1 pits: ")
-player1.print_player_pits()
-print("Player 2 pits: ")
-player2.print_player_pits()
-game.play_game(1, 1)
-game.play_game(1, 2)
-game.play_game(1, 3)
-game.play_game(1, 4)
-game.play_game(1, 5)
-game.play_game(1, 6)
-game.print_board()
-print(game.return_winner())
-print(game.return_winner())
+def main():
+    game = Mancala()
+    player1 = Player("Monkey")
+    player2 = Player("Gibbon")
+    player3 = Player("siamang")
+    game.add_player_to_game(player1)
+    game.view_players()
+    game.add_player_to_game(player2)
+    game.view_players()
+    print(game.add_player_to_game(player3))
+
+    print(game.play_game(1, 3))
+    game.play_game(1, 1)
+    game.play_game(2, 3)
+    game.play_game(2, 4)
+    game.play_game(1, 2)
+    game.play_game(2, 2)
+    game.play_game(1, 1)
+    game.print_board()
+    print(game.return_winner())
 
 
+if __name__ == "__main__":
+    main()
